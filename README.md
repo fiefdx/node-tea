@@ -2,9 +2,9 @@
 
 A string encrypt & decrypt package based on TEA
 
-# Get & Use
------------
-1. Get it
+# get & use
+
+1. get it
    
    ```bash
    git clone git@github.com:fiefdx/node-tea.git
@@ -14,7 +14,7 @@ A string encrypt & decrypt package based on TEA
    npm install node-tea
    
    ```
-2. Use it
+2. use it
    
    ```javascript
    var tea = require('node-tea');
