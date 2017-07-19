@@ -1,0 +1,24 @@
+{
+  "name": "node-tea",
+  "version": "0.0.1",
+  "description": "a string encrypt & decrypt package based on TEA",
+  "main": "tea.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fiefdx/node-tea.git"
+  },
+  "keywords": [
+    "encrypt",
+    "decrypt",
+    "tea"
+  ],
+  "author": "fiefdx",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fiefdx/node-tea/issues"
+  },
+  "homepage": "https://github.com/fiefdx/node-tea#readme"
+}
