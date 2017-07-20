@@ -509,3 +509,5 @@ Utf8.decode = function(strUtf) {
 
 exports.encrypt = Tea.strEncrypt
 exports.decrypt = Tea.strDecrypt
+exports.encode = Utf8.encode
+exports.decode = Utf8.decode
