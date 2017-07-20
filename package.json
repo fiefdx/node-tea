@@ -1,6 +1,6 @@
 {
   "name": "node-tea",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "a string encrypt & decrypt package based on TEA",
   "main": "tea.js",
   "scripts": {
