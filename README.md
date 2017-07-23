@@ -19,8 +19,10 @@ A string encrypt & decrypt package based on TEA
    ```javascript
    var tea = require('node-tea');
 
-   s = tea.encrypt('this is a test', '111111'); # encrypt the string
+   input = tea.encode('this is a test, 这是一个测试')
+   s = tea.encrypt(input, '111111');
    console.log(s);
-   ss = tea.decrypt(s, '111111'); # decrypt the string
-   console.log(ss);
+   ss = tea.decrypt(s, '111111');
+   output = tea.decode(ss)
+   console.log(output);
    ```
