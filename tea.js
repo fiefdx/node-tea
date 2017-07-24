@@ -36,7 +36,7 @@ Tea.teaDecrypt = function (v, k, tea_sum) {
     v[0] = v0 & 0x00000000ffffffff; v[1] = v1 & 0x00000000ffffffff;
 }
 
-Tea.teaStrEncrypt = function (v, k, length, tea_sum) {
+Tea.teaStrEncrypt = function (v, k, tea_sum) {
     var i_0, i_1;
     var v_tmp = [0, 0];
     var cipertext = new Long(0x00000000, 0x00000000, true);
@@ -44,7 +44,7 @@ Tea.teaStrEncrypt = function (v, k, length, tea_sum) {
     var plaintext = new Long(0x00000000, 0x00000000, true);
     var encrypt_text = new Long(0x00000000, 0x00000000, true);
     var and_flag = new Long(0xffffffff, 0x00000000, true);
-    length = length / 2;
+    var length = v.length / 2;
 
     pre_plaintext = pre_plaintext.or(and_flag.and(v[0]));
     pre_plaintext = pre_plaintext.shiftLeft(32);
@@ -82,7 +82,7 @@ Tea.teaStrEncrypt = function (v, k, length, tea_sum) {
     }
 }
 
-Tea.teaStrDecrypt = function (v, k, length, tea_sum) {
+Tea.teaStrDecrypt = function (v, k, tea_sum) {
     var i_0, i_1;
     var pos = 0;
     var v_tmp = [0, 0];
@@ -92,7 +92,7 @@ Tea.teaStrDecrypt = function (v, k, length, tea_sum) {
     var plaintext = new Long(0x00000000, 0x00000000, true);
     var encrypt_text = new Long(0x00000000, 0x00000000, true);
     var and_flag = new Long(0xffffffff, 0x00000000, true);
-    length = length / 2;
+    var length = v.length / 2;
 
     cipertext = cipertext.or(and_flag.and(v[0]));
     cipertext = cipertext.shiftLeft(32);
@@ -143,7 +143,7 @@ Tea.strEncrypt = function (v, k) { // v: string, k: string
     var int_k = Tea.hexStrToInts(hex_k);
     var s_b64 = Base64.encode(v);
     var int_v = Tea.strComposeInts(s_b64);
-    Tea.teaStrEncrypt(int_v, int_k, int_v.length, 32);
+    Tea.teaStrEncrypt(int_v, int_k, 32);
     var int_s = Tea.intsToStr(int_v);
     return Base64.encode(int_s);
 }
@@ -153,7 +153,7 @@ Tea.strDecrypt = function (v, k) { // v: string base64, k: string
     var int_k = Tea.hexStrToInts(hex_k);
     var s_str = Base64.decode(v);
     var int_v = Tea.strToInts(s_str);
-    var pos = Tea.teaStrDecrypt(int_v, int_k, int_v.length, 32);
+    var pos = Tea.teaStrDecrypt(int_v, int_k, 32);
     var b64 = Tea.intsParseStr(int_v, pos);
     return Base64.decode(b64);
 }
