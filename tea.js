@@ -138,7 +138,7 @@ Tea.teaStrDecrypt = function (v, k, tea_sum) {
     return pos;
 }
 
-Tea.strEncrypt = function (v, k) { // v: string, k: string
+Tea.strBase64Encrypt = function (v, k) { // v: string, k: string
     var hex_k = SparkMD5.hash(SparkMD5.hash(k));
     var int_k = Tea.hexStrToInts(hex_k);
     var s_b64 = Base64.encode(v);
@@ -148,7 +148,7 @@ Tea.strEncrypt = function (v, k) { // v: string, k: string
     return Base64.encode(int_s);
 }
 
-Tea.strDecrypt = function (v, k) { // v: string base64, k: string
+Tea.strBase64Decrypt = function (v, k) { // v: string base64, k: string
     var hex_k = SparkMD5.hash(SparkMD5.hash(k));
     var int_k = Tea.hexStrToInts(hex_k);
     var s_str = Base64.decode(v);
@@ -156,6 +156,22 @@ Tea.strDecrypt = function (v, k) { // v: string base64, k: string
     var pos = Tea.teaStrDecrypt(int_v, int_k, 32);
     var b64 = Tea.intsParseStr(int_v, pos);
     return Base64.decode(b64);
+}
+
+Tea.strEncrypt = function (v, k) { // v: string, k: string
+    var hex_k = SparkMD5.hash(SparkMD5.hash(k));
+    var int_k = Tea.hexStrToInts(hex_k);
+    var int_v = Tea.strComposeInts(v);
+    Tea.teaStrEncrypt(int_v, int_k, 32);
+    return Tea.intsToStr(int_v);
+}
+
+Tea.strDecrypt = function (v, k) { // v: string base64, k: string
+    var hex_k = SparkMD5.hash(SparkMD5.hash(k));
+    var int_k = Tea.hexStrToInts(hex_k);
+    var int_v = Tea.strToInts(v);
+    var pos = Tea.teaStrDecrypt(int_v, int_k, 32);
+    return Tea.intsParseStr(int_v, pos);
 }
 
 Tea.strToBytes = function (s) {
@@ -423,7 +439,9 @@ Utf8.decode = function(strUtf) {
   return strUni;
 }
 
+exports.encryptBase64 = Tea.strBase64Encrypt
+exports.decryptBase64 = Tea.strBase64Decrypt
 exports.encrypt = Tea.strEncrypt
 exports.decrypt = Tea.strDecrypt
-exports.encode = Utf8.encode
-exports.decode = Utf8.decode
+exports.encodeUtf8 = Utf8.encode
+exports.decodeUtf8 = Utf8.decode
