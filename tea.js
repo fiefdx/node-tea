@@ -46,55 +46,35 @@ Tea.teaStrEncrypt = function (v, k, length, tea_sum) {
     var and_flag = new Long(0xffffffff, 0x00000000, true);
     length = length / 2;
 
-    // pre_plaintext |= and_flag & v[0];
     pre_plaintext = pre_plaintext.or(and_flag.and(v[0]));
-    // pre_plaintext <<= 32;
     pre_plaintext = pre_plaintext.shiftLeft(32);
-    // pre_plaintext |= v[1];
     pre_plaintext = pre_plaintext.or(v[1]);
     v_tmp[0] = v[0];
     v_tmp[1] = v[1];
     Tea.teaEncrypt(v_tmp, k, tea_sum);
     v[0] = v_tmp[0];
     v[1] = v_tmp[1];
-    // cipertext |= and_flag & v[0];
     cipertext = cipertext.or(and_flag.and(v[0]));
-    // cipertext <<= 32;
     cipertext = cipertext.shiftLeft(32);
-    // cipertext |= and_flag & v[1];
     cipertext = cipertext.or(and_flag.and(v[1]));
     for (var i = 1; i<length; i++){
         i_0 = i*2;
         i_1 = i_0 + 1;
-        // plaintext |= and_flag & v[i_0];
         plaintext = plaintext.or(and_flag.and(v[i_0]));
-        // plaintext <<= 32;
         plaintext = plaintext.shiftLeft(32);
-        // plaintext |= and_flag & v[i_1];
         plaintext = plaintext.or(and_flag.and(v[i_1]));
-        // plaintext ^= cipertext;
         plaintext = plaintext.xor(cipertext);
-        // v_tmp[0] = ((plaintext >>> 32) & 0xffffffff);
         v_tmp[0] = plaintext.shiftRightUnsigned(32).toUnsigned().toInt();
-        // v_tmp[1] = (plaintext & 0xffffffff);
         v_tmp[1] = plaintext.toUnsigned().toInt();
         Tea.teaEncrypt(v_tmp, k, tea_sum);
         v[i_0] = v_tmp[0];
         v[i_1] = v_tmp[1];
-        // console.log("vi_0, vi_1: " + v[i_0] + " " + v[i_1]);
-        // encrypt_text |= and_flag & v[i_0];
         encrypt_text = encrypt_text.or(and_flag.and(v[i_0]));
-        // encrypt_text <<= 32;
         encrypt_text = encrypt_text.shiftLeft(32);
-        // encrypt_text |= and_flag & v[i_1];
         encrypt_text = encrypt_text.or(and_flag.and(v[i_1]));
-        // encrypt_text ^= pre_plaintext;
         encrypt_text = encrypt_text.xor(pre_plaintext);
-        // v[i_0] = ((encrypt_text >>> 32) & 0xffffffff);
         v[i_0] = encrypt_text.shiftRightUnsigned(32).toUnsigned().toInt();
-        // v[i_1] = (encrypt_text & 0xffffffff);
         v[i_1] = encrypt_text.toUnsigned().toInt();
-        // console.log("vi_0, vi_1: " + v[i_0] + " " + v[i_1]);
         cipertext = encrypt_text.toUnsigned();
         pre_plaintext = plaintext.toUnsigned();
         plaintext = new Long(0x00000000, 0x00000000, true);
@@ -114,11 +94,8 @@ Tea.teaStrDecrypt = function (v, k, length, tea_sum) {
     var and_flag = new Long(0xffffffff, 0x00000000, true);
     length = length / 2;
 
-    // cipertext |= and_flag & v[0];
     cipertext = cipertext.or(and_flag.and(v[0]));
-    // cipertext <<= 32;
     cipertext = cipertext.shiftLeft(32);
-    // cipertext |= and_flag & v[1];
     cipertext = cipertext.or(and_flag.and(v[1]));
     v_tmp[0] = v[0];
     v_tmp[1] = v[1];
@@ -126,51 +103,32 @@ Tea.teaStrDecrypt = function (v, k, length, tea_sum) {
     v[0] = v_tmp[0];
     v[1] = v_tmp[1];
     pos = v[0];
-    // pre_plaintext |= and_flag & v[0];
     pre_plaintext = pre_plaintext.or(and_flag.and(v[0]));
-    // pre_plaintext <<= 32;
     pre_plaintext = pre_plaintext.shiftLeft(32);
-    // pre_plaintext |= and_flag & v[1];
     pre_plaintext = pre_plaintext.or(and_flag.and(v[1]));
     for (var i = 1; i<length; i++){
         i_0 = i*2;
         i_1 = i_0 + 1;
-        // cipertext_tmp |= and_flag & v[i_0];
         cipertext_tmp = cipertext_tmp.or(and_flag.and(v[i_0]));
-        // cipertext_tmp <<= 32;
         cipertext_tmp = cipertext_tmp.shiftLeft(32);
-        // cipertext_tmp |= and_flag & v[i_1];
         cipertext_tmp = cipertext_tmp.or(and_flag.and(v[i_1]));
-        // encrypt_text |= and_flag & v[i_0];
         encrypt_text = encrypt_text.or(and_flag.and(v[i_0]));
-        // encrypt_text <<= 32;
         encrypt_text = encrypt_text.shiftLeft(32);
-        // encrypt_text |= and_flag & v[i_1];
         encrypt_text = encrypt_text.or(and_flag.and(v[i_1]));
-        // encrypt_text ^= pre_plaintext;
         encrypt_text = encrypt_text.xor(pre_plaintext);
-        // v[i_0] = ((encrypt_text >>> 32) & 0xffffffff);
         v[i_0] = encrypt_text.shiftRightUnsigned(32).toUnsigned().toInt();
-        // v[i_1] = (encrypt_text & 0xffffffff);
         v[i_1] = encrypt_text.toUnsigned().toInt();
         v_tmp[0] = v[i_0];
         v_tmp[1] = v[i_1];
         Tea.teaDecrypt(v_tmp, k, tea_sum);
         v[i_0] = v_tmp[0];
         v[i_1] = v_tmp[1];
-        // plaintext |= and_flag & v[i_0];
         plaintext = plaintext.or(and_flag.and(v[i_0]));
-        // plaintext <<= 32;
         plaintext = plaintext.shiftLeft(32);
-        // plaintext |= and_flag & v[i_1];
         plaintext = plaintext.or(and_flag.and(v[i_1]));
-        // plaintext ^= cipertext;
         plaintext = plaintext.xor(cipertext);
-        // v[i_0] = ((plaintext >>> 32) & 0xffffffff);
         v[i_0] = plaintext.shiftRightUnsigned(32).toUnsigned().toInt();
-        // v[i_1] = (plaintext & 0xffffffff);
         v[i_1] = plaintext.toUnsigned().toInt();
-        // pre_plaintext = plaintext ^ cipertext;
         pre_plaintext = plaintext.xor(cipertext);
         cipertext = cipertext_tmp.toUnsigned();
         cipertext_tmp = new Long(0x00000000, 0x00000000, true);
@@ -182,33 +140,21 @@ Tea.teaStrDecrypt = function (v, k, length, tea_sum) {
 
 Tea.strEncrypt = function (v, k) { // v: string, k: string
     var hex_k = SparkMD5.hash(SparkMD5.hash(k));
-    //console.log("hex_k: " + hex_k);
     var int_k = Tea.hexStrToInts(hex_k);
-    //console.log("int_k: " + int_k);
     var s_b64 = Base64.encode(v);
-    //console.log("s_b64: " + s_b64);
     var int_v = Tea.strComposeInts(s_b64);
-    //console.log("int_v: " + int_v);
     Tea.teaStrEncrypt(int_v, int_k, int_v.length, 32);
-    //console.log("int_v: " + int_v);
     var int_s = Tea.intsToStr(int_v);
-    //console.log("int_s: " + int_s.toSource());
     return Base64.encode(int_s);
 }
 
 Tea.strDecrypt = function (v, k) { // v: string base64, k: string
     var hex_k = SparkMD5.hash(SparkMD5.hash(k));
-    //console.log("hex_k: " + hex_k);
     var int_k = Tea.hexStrToInts(hex_k);
-    //console.log("int_k: " + int_k);
     var s_str = Base64.decode(v);
-    //console.log("s_str: " + s_str.toSource());
     var int_v = Tea.strToInts(s_str);
-    //console.log("int_v: " + int_v);
     var pos = Tea.teaStrDecrypt(int_v, int_k, int_v.length, 32);
-    //console.log("int_v: " + int_v);
     var b64 = Tea.intsParseStr(int_v, pos);
-    //console.log("d_base64: " + b64);
     return Base64.decode(b64);
 }
 
@@ -217,13 +163,11 @@ Tea.strToBytes = function (s) {
     for (var i = 0; i < s.length; i++) {
         bytes.push(s.charCodeAt(i));
     }
-    // console.log("str_to_bytes: " + bytes);
     return bytes;
 }
 
 Tea.bytesToStr = function (b) {
     var result = "";
-    // console.log("bytes_to_str: " + b);
 	for(var i = 0; i < b.length; i++) {
 		result += (String.fromCharCode(b[i]));
 	}
@@ -234,10 +178,6 @@ Tea.strToInts = function (s) {
     var b = Tea.strToBytes(s);
     var r = new Array(b.length / 4);
     for (var i = 0; i < (b.length / 4); i++) {
-        // r[i] = (((b[i*4+3] & 0x000000ff) << 24)|
-        //         ((b[i*4+2] & 0x000000ff) << 16)|
-        //         ((b[i*4+1] & 0x000000ff) << 8)|
-        //         (b[i*4] & 0x000000ff));
         r[i] = (((b[i*4] & 0x000000ff) << 24)|
                 ((b[i*4+1] & 0x000000ff) << 16)|
                 ((b[i*4+2] & 0x000000ff) << 8)|
@@ -250,16 +190,11 @@ Tea.intsToStr = function (i) {
     var b = new Array(i.length * 4);
     var r = "";
     for (var j = 0; j < i.length; j++) {
-        // b[j*4] = i[j] & 0x000000ff;
-        // b[j*4+1] = (i[j] >>> 8) & 0x000000ff;
-        // b[j*4+2] = (i[j] >>> 16) & 0x000000ff;
-        // b[j*4+3] = (i[j] >>> 24) & 0x000000ff;
         b[j*4+3] = i[j] & 0x000000ff;
         b[j*4+2] = (i[j] >>> 8) & 0x000000ff;
         b[j*4+1] = (i[j] >>> 16) & 0x000000ff;
         b[j*4] = (i[j] >>> 24) & 0x000000ff;
     }
-    // console.log("b: " + b);
     r = Tea.bytesToStr(b);
     return r;
 }
@@ -267,35 +202,22 @@ Tea.intsToStr = function (i) {
 Tea.strComposeInts = function (s) {
     var b = Tea.strToBytes(s);
     var fill_n = (8 - (b.length + 2)) % 8;
-    // console.log("fill_n: " + fill_n);
     if (fill_n < 0) {
         fill_n = 8 + fill_n + 2;
     } else {
         fill_n += 2;
     }
-    // console.log("b.length: " + b.length);
-    // console.log("fill_n: " + fill_n);
     var fill_b = new Array(fill_n);
     for(var i = 0; i < fill_n; i++) {
         fill_b[i] = Tea.random(0, 0x7f);
-        // fill_b[i] = 0x70;
     }
-    // console.log("fill_b: " + fill_b);
     var b_after_fill = new Array();
     b_after_fill.push(((fill_n - 2)|0xf8));
-    // console.log(b_after_fill);
     b_after_fill = b_after_fill.concat(fill_b);
-    // console.log(b_after_fill);
     b_after_fill = b_after_fill.concat(b);
-    // console.log(b_after_fill);
     b_after_fill = b_after_fill.concat([0, 0, 0, 0, 0, 0, 0]);
-    // console.log(b_after_fill);
     var r = new Array(b_after_fill.length / 4);
     for (var i = 0; i < (b_after_fill.length / 4); i++) {
-        // r[i] = (b_after_fill[i*4]|
-        //         (b_after_fill[i*4+1] << 8)|
-        //         (b_after_fill[i*4+2] << 16)|
-        //         (b_after_fill[i*4+3] << 24));
         r[i] = (b_after_fill[i*4+3]|
                 (b_after_fill[i*4+2] << 8)|
                 (b_after_fill[i*4+1] << 16)|
@@ -308,18 +230,12 @@ Tea.intsParseStr = function (i, pos) {
     var b_after_fill = new Array(i.length * 4);
     var r = "";
     for (var j = 0; j < i.length; j++) {
-        // b_after_fill[j*4] = i[j] & 0x000000ff;
-        // b_after_fill[j*4+1] = (i[j] >>> 8) & 0x000000ff;
-        // b_after_fill[j*4+2] = (i[j] >>> 16) & 0x000000ff;
-        // b_after_fill[j*4+3] = (i[j] >>> 24) & 0x000000ff;
         b_after_fill[j*4+3] = i[j] & 0x000000ff;
         b_after_fill[j*4+2] = (i[j] >>> 8) & 0x000000ff;
         b_after_fill[j*4+1] = (i[j] >>> 16) & 0x000000ff;
         b_after_fill[j*4] = (i[j] >>> 24) & 0x000000ff;
     }
-    // console.log("b_after_fill: " + b_after_fill);
     pos = (((pos >>> 24) & 0x000000ff) & 0x07) + 2;
-    // console.log("pos: " + pos);
     if (b_after_fill.slice(b_after_fill.length - 7, b_after_fill.length).join("") != "0000000") {
         return r;
     } else {
