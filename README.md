@@ -29,7 +29,7 @@ A string encrypt & decrypt package based on TEA
    input = tea.encodeUtf8('this is a test, 这是一个测试')
    s = tea.encryptBase64(input, '111111'); # output is base64 string
    console.log(s);
-   ss = tea.decryptBase64(s, '111111'); # output is base64 string
+   ss = tea.decryptBase64(s, '111111'); # input is base64 string
    output = tea.decodeUtf8(ss)
    console.log(output);
    ```
