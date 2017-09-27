@@ -1,5 +1,7 @@
 /* - - - - - - - - - - - - - - - - Tea by fiefdx- - - - - - - - - - - - - - - - -  */
 
+"use strict";
+
 var SparkMD5 = require('./spark-md5');
 var Long = require('./long');
 
@@ -142,7 +144,7 @@ Tea.strBase64Encrypt = function (v, k) { // v: string, k: string
     var hex_k = SparkMD5.hash(SparkMD5.hash(k));
     var int_k = Tea.hexStrToInts(hex_k);
     var s_b64 = Base64.encode(v);
-    var int_v = Tea.strComposeInts(s_b64);
+    var int_v = Tea.composeInts(s_b64);
     Tea.teaStrEncrypt(int_v, int_k, 32);
     var int_s = Tea.intsToStr(int_v);
     return Base64.encode(int_s);
@@ -154,24 +156,40 @@ Tea.strBase64Decrypt = function (v, k) { // v: string base64, k: string
     var s_str = Base64.decode(v);
     var int_v = Tea.strToInts(s_str);
     var pos = Tea.teaStrDecrypt(int_v, int_k, 32);
-    var b64 = Tea.intsParseStr(int_v, pos);
+    var b64 = Tea.intsParse(int_v, pos, false);
     return Base64.decode(b64);
 }
 
 Tea.strEncrypt = function (v, k) { // v: string, k: string
     var hex_k = SparkMD5.hash(SparkMD5.hash(k));
     var int_k = Tea.hexStrToInts(hex_k);
-    var int_v = Tea.strComposeInts(v);
+    var int_v = Tea.composeInts(v);
     Tea.teaStrEncrypt(int_v, int_k, 32);
     return Tea.intsToStr(int_v);
 }
 
-Tea.strDecrypt = function (v, k) { // v: string base64, k: string
+Tea.strDecrypt = function (v, k) { // v: string, k: string
     var hex_k = SparkMD5.hash(SparkMD5.hash(k));
     var int_k = Tea.hexStrToInts(hex_k);
     var int_v = Tea.strToInts(v);
     var pos = Tea.teaStrDecrypt(int_v, int_k, 32);
-    return Tea.intsParseStr(int_v, pos);
+    return Tea.intsParse(int_v, pos, false);
+}
+
+Tea.bytesEncrypt = function (v, k) { // v: bytes array, k: string
+    var hex_k = SparkMD5.hash(SparkMD5.hash(k));
+    var int_k = Tea.hexStrToInts(hex_k);
+    var int_v = Tea.composeInts(v);
+    Tea.teaStrEncrypt(int_v, int_k, 32);
+    return Tea.intsToBytes(int_v);
+}
+
+Tea.bytesDecrypt = function (v, k) { // v: bytes array, k: string
+    var hex_k = SparkMD5.hash(SparkMD5.hash(k));
+    var int_k = Tea.hexStrToInts(hex_k);
+    var int_v = Tea.bytesToInts(v);
+    var pos = Tea.teaStrDecrypt(int_v, int_k, 32);
+    return Tea.intsParse(int_v, pos, true);
 }
 
 Tea.strToBytes = function (s) {
@@ -188,6 +206,28 @@ Tea.bytesToStr = function (b) {
 		result += (String.fromCharCode(b[i]));
 	}
 	return result;
+}
+
+Tea.bytesToInts = function (b) {
+    var r = new Array(b.length / 4);
+    for (var i = 0; i < (b.length / 4); i++) {
+        r[i] = (((b[i*4] & 0x000000ff) << 24)|
+                ((b[i*4+1] & 0x000000ff) << 16)|
+                ((b[i*4+2] & 0x000000ff) << 8)|
+                (b[i*4+3] & 0x000000ff));
+    }
+    return r;
+}
+
+Tea.intsToBytes = function (i) {
+    var b = new Array(i.length * 4);
+    for (var j = 0; j < i.length; j++) {
+        b[j*4+3] = i[j] & 0x000000ff;
+        b[j*4+2] = (i[j] >>> 8) & 0x000000ff;
+        b[j*4+1] = (i[j] >>> 16) & 0x000000ff;
+        b[j*4] = (i[j] >>> 24) & 0x000000ff;
+    }
+    return b;
 }
 
 Tea.strToInts = function (s) {
@@ -215,8 +255,13 @@ Tea.intsToStr = function (i) {
     return r;
 }
 
-Tea.strComposeInts = function (s) {
-    var b = Tea.strToBytes(s);
+Tea.composeInts = function (s) {
+    var b;
+    if (s instanceof Array) { // bytes array
+        b = s;
+    } else { // string
+        b = Tea.strToBytes(s);
+    }
     var fill_n = (8 - (b.length + 2)) % 8;
     if (fill_n < 0) {
         fill_n = 8 + fill_n + 2;
@@ -242,9 +287,9 @@ Tea.strComposeInts = function (s) {
     return r;
 }
 
-Tea.intsParseStr = function (i, pos) {
+Tea.intsParse = function (i, pos, array) {
     var b_after_fill = new Array(i.length * 4);
-    var r = "";
+    var r;
     for (var j = 0; j < i.length; j++) {
         b_after_fill[j*4+3] = i[j] & 0x000000ff;
         b_after_fill[j*4+2] = (i[j] >>> 8) & 0x000000ff;
@@ -253,11 +298,19 @@ Tea.intsParseStr = function (i, pos) {
     }
     pos = (((pos >>> 24) & 0x000000ff) & 0x07) + 2;
     if (b_after_fill.slice(b_after_fill.length - 7, b_after_fill.length).join("") != "0000000") {
-        return r;
+        if (array) {
+            r = [];
+        } else {
+            r = "";
+        }
     } else {
-        r = Tea.bytesToStr(b_after_fill.slice(pos + 1, b_after_fill.length - 7));
-        return r;
+        if (array) {
+            r = b_after_fill.slice(pos + 1, b_after_fill.length - 7)
+        } else {
+            r = Tea.bytesToStr(b_after_fill.slice(pos + 1, b_after_fill.length - 7));
+        }
     }
+    return r;
 }
 
 Tea.hexStrToInts = function (h) {
@@ -443,5 +496,9 @@ exports.encryptBase64 = Tea.strBase64Encrypt
 exports.decryptBase64 = Tea.strBase64Decrypt
 exports.encrypt = Tea.strEncrypt
 exports.decrypt = Tea.strDecrypt
+exports.encryptBytes = Tea.bytesEncrypt
+exports.decryptBytes = Tea.bytesDecrypt
+exports.strToBytes = Tea.strToBytes
+exports.bytesToStr = Tea.bytesToStr
 exports.encodeUtf8 = Utf8.encode
 exports.decodeUtf8 = Utf8.decode
