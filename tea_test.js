@@ -1,5 +1,7 @@
 "use strict";
 
+let util = require('util');
+
 let tea = require('./tea');
 
 {
@@ -23,7 +25,7 @@ let tea = require('./tea');
 {
 	let input = tea.strToBytes(tea.encodeUtf8('this is a test, 这是一个测试'));
 	let s = tea.encryptBytes(input, '111111');
-	console.log(s);
+	console.log(util.format('%s', s));
 	let ss = tea.decryptBytes(s, '111111');
 	let output = tea.decodeUtf8(tea.bytesToStr(ss));
 	console.log(output);

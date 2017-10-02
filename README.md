@@ -17,6 +17,7 @@ A string encrypt & decrypt package based on TEA
 2. use it
    
    ```javascript
+   let util = require('util');
    let tea = require('node-tea');
 
    {
@@ -40,7 +41,7 @@ A string encrypt & decrypt package based on TEA
    {
       let input = tea.strToBytes(tea.encodeUtf8('this is a test, 这是一个测试'));
       let s = tea.encryptBytes(input, '111111');
-      console.log(s);
+      console.log(util.format('%s', s));
       let ss = tea.decryptBytes(s, '111111');
       let output = tea.decodeUtf8(tea.bytesToStr(ss));
       console.log(output);
